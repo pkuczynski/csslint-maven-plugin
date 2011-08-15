@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Build time: 15-August-2011 04:06:14 */
+/* Build time: 15-August-2011 04:56:21 */
 //print for rhino and nodejs
 if(typeof print == "undefined") {
     var print = console.log;
@@ -101,7 +101,7 @@ function processFiles(files, options){
                     processFile(file,options);
                 }
             });
-
+            
             print(formatter.endFormat());
         }
     }
