@@ -1,0 +1,45 @@
+diff --git a/src/cli/node-cli.js b/src/cli/node-cli.js
+index cdcaf25..890a879 100644
+--- a/src/cli/node-cli.js
++++ b/src/cli/node-cli.js
+@@ -206,9 +206,15 @@ function processFiles(files, options){
+         } else {
+             formatter = CSSLint.getFormatter(formatId);
+             print(formatter.startFormat());
+-            exitCode = files.some(function(file){
+-                processFile(file,options);
++
++            files.forEach(function(file){
++                if (exitCode == 0) {
++                    exitCode = processFile(file,options);
++                } else {
++                    processFile(file,options);
++                }
+             });
++            
+             print(formatter.endFormat());
+         }
+     }
+diff --git a/src/cli/util.js b/src/cli/util.js
+index 0e2c28a..5bf409a 100644
+--- a/src/cli/util.js
++++ b/src/cli/util.js
+@@ -91,9 +91,15 @@ function processFiles(files, options){
+         } else {
+             formatter = CSSLint.getFormatter(formatId);
+             print(formatter.startFormat());
+-            exitCode = files.some(function(file){
+-                processFile(file,options);
++
++            files.forEach(function(file){
++                if (exitCode == 0) {
++                    exitCode = processFile(file,options);
++                } else {
++                    processFile(file,options);
++                }
+             });
++
+             print(formatter.endFormat());
+         }
+     }
+
