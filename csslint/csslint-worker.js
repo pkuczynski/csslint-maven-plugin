@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 */
-/* Build time: 27-July-2011 01:56:07 */
+/* Build time: 15-August-2011 04:06:14 */
 /*!
 Parser-Lib
 Copyright (c) 2009-2011 Nicholas C. Zakas. All rights reserved.
@@ -45,7 +45,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 */
-/* Build time: 13-July-2011 04:35:28 */
+/* Build time: 19-July-2011 01:46:47 */
 var parserlib = {};
 (function(){
 
@@ -910,7 +910,6 @@ TokenStreamBase.prototype = {
 };
 
 
-
 parserlib.util = {
 StringReader: StringReader,
 SyntaxError : SyntaxError,
@@ -919,7 +918,6 @@ EventTarget : EventTarget,
 TokenStreamBase : TokenStreamBase
 };
 })();
-
 /* 
 Parser-Lib
 Copyright (c) 2009-2011 Nicholas C. Zakas. All rights reserved.
@@ -943,7 +941,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 */
-/* Build time: 13-July-2011 04:35:28 */
+/* Build time: 19-July-2011 01:46:47 */
 (function(){
 var EventTarget = parserlib.util.EventTarget,
 TokenStreamBase = parserlib.util.TokenStreamBase,
@@ -1129,7 +1127,6 @@ function Combinator(text, line, col){
 
 Combinator.prototype = new SyntaxUnit();
 Combinator.prototype.constructor = Combinator;
-
 
 
 var Level1Properties = {
@@ -1338,7 +1335,6 @@ function MediaFeature(name, value){
 MediaFeature.prototype = new SyntaxUnit();
 MediaFeature.prototype.constructor = MediaFeature;
 
-
 /**
  * Represents an individual media query.
  * @namespace parserlib.css
@@ -1380,7 +1376,6 @@ function MediaQuery(modifier, mediaType, features, line, col){
 
 MediaQuery.prototype = new SyntaxUnit();
 MediaQuery.prototype.constructor = MediaQuery;
-
 
 /**
  * A CSS3 parser.
@@ -2764,7 +2759,9 @@ Parser.prototype = function(){
                 var tokenStream = this._tokenStream,
                     property    = null,
                     expr        = null,
-                    prio        = null;
+                    prio        = null,
+                    error       = null,
+                    valid       = true;
                 
                 property = this._property();
                 if (property !== null){
@@ -2781,13 +2778,22 @@ Parser.prototype = function(){
                     
                     prio = this._prio();
                     
+                    try {
+                        this._validateProperty(property, expr);
+                    } catch (ex) {
+                        valid = false;
+                        error = ex;
+                    }
+                    
                     this.fire({
                         type:       "property",
                         property:   property,
                         value:      expr,
                         important:  prio,
                         line:       property.line,
-                        col:        property.col
+                        col:        property.col,
+                        valid:      valid,
+                        error:      error
                     });                      
                     
                     return true;
@@ -3358,6 +3364,41 @@ Parser.prototype = function(){
             },
             
             //-----------------------------------------------------------------
+            // Validation methods
+            //-----------------------------------------------------------------
+            _validateProperty: function(property, value){
+                var name = property.text.toLowerCase(),
+                    validation,
+                    i, len;
+                
+                if (Properties[name]){
+                    validation = Properties[name];
+                    if (typeof validation == "object"){
+                        for (i=0, len=validation.parts.length; i < len; i++){
+                            if (!validation.parts[i]){
+                                throw new ValidationError("Unexpected value. Expected only " + validation.parts.length + " values for property '" + property + "'.",
+                                    value.line, value.col);
+                            } else if ((new RegExp("^("+validation.parts[i].types.join("|")+")$")).test(value.parts[i].type)){
+                                if (validation.parts[i][RegExp.$1]){
+                                    if (!validation.parts[i][RegExp.$1].test(value.parts[i])){
+                                        throw new ValidationError("Unexpected value '" + value.parts[i] + 
+                                            "'.", value.parts[i].line, value.parts[i].col);
+                                    }
+                                }
+                            } else {
+                                throw new ValidationError("Unexpected value type " + value.parts[i].type + 
+                                    ". Expected " + validation.parts[i].types + ".", value.parts[i].line, value.parts[i].col);
+                            }
+                        }
+                    }
+                    
+                    //otherwise, no validation available yet
+                } else if (name.indexOf("-") !== 0){    //vendor prefixed are ok
+                    throw new ValidationError("Property '" + property + "' isn't recognized.", property.line, property.col);
+                }
+            },
+            
+            //-----------------------------------------------------------------
             // Parsing methods
             //-----------------------------------------------------------------
             
@@ -3473,6 +3514,348 @@ nth
          ['-'|'+']? INTEGER | {O}{D}{D} | {E}{V}{E}{N} ] S*
   ;
 */
+var Validation = {
+    measurement: {
+        parts: [
+            {
+                types: ["length", "percentage", "integer", "identifier"],
+                identifier: /^(auto|inherit)$/i,
+                integer: /^0$/
+            }               
+        ]
+    },
+    oneColor: {
+        maxParts: 1,
+        minParts: 1,
+        parts: [
+            {
+                types: ["color", "identifier"],
+                identifier: /^(inherit|transparent)$/i
+            }               
+        ]    
+    }
+};
+
+
+
+    
+       
+
+
+
+
+var Properties = {
+
+    "alignment-adjust": 1,
+    "alignment-baseline": 1,
+    "animation": 1,
+    "animation-delay": 1,
+    "animation-direction": 1,
+    "animation-duration": 1,
+    "animation-iteration-count": 1,
+    "animation-name": 1,
+    "animation-play-state": 1,
+    "animation-timing-function": 1,
+    "appearance": 1,
+    "azimuth": 1,
+    "backface-visibility": 1,
+    "background": 1,
+    "background-attachment": 1,
+    "background-break": 1,
+    "background-clip": 1,
+    "background-color": Validation.oneColor,
+    "background-image": 1,
+    "background-origin": 1,
+    "background-position": 1,
+    "background-repeat": 1,
+    "background-size": 1,
+    "baseline-shift": 1,
+    "binding": 1,
+    "bleed": 1,
+    "bookmark-label": 1,
+    "bookmark-level": 1,
+    "bookmark-state": 1,
+    "bookmark-target": 1,
+    "border": 1,
+    "border-bottom": 1,
+    "border-bottom-color": 1,
+    "border-bottom-left-radius": 1,
+    "border-bottom-right-radius": 1,
+    "border-bottom-style": 1,
+    "border-bottom-width": 1,
+    "border-collapse": 1,
+    "border-color": Validation.oneColor,
+    "border-image": 1,
+    "border-image-outset": 1,
+    "border-image-repeat": 1,
+    "border-image-slice": 1,
+    "border-image-source": 1,
+    "border-image-width": 1,
+    "border-left": 1,
+    "border-left-color": 1,
+    "border-left-style": 1,
+    "border-left-width": 1,
+    "border-radius": 1,
+    "border-right": 1,
+    "border-right-color": 1,
+    "border-right-style": 1,
+    "border-right-width": 1,
+    "border-spacing": 1,
+    "border-style": 1,
+    "border-top": 1,
+    "border-top-color": 1,
+    "border-top-left-radius": 1,
+    "border-top-right-radius": 1,
+    "border-top-style": 1,
+    "border-top-width": 1,
+    "border-width": 1,
+    "bottom": Validation.measurement, 
+    "box-align": 1,
+    "box-decoration-break": 1,
+    "box-direction": 1,
+    "box-flex": 1,
+    "box-flex-group": 1,
+    "box-lines": 1,
+    "box-ordinal-group": 1,
+    "box-orient": 1,
+    "box-pack": 1,
+    "box-shadow": 1,
+    "box-sizing": 1,
+    "break-after": 1,
+    "break-before": 1,
+    "break-inside": 1,
+    "caption-side": 1,
+    "clear": 1,
+    "clip": 1,
+    "color": {
+        parts: [
+            {
+                types: ["color", "identifier"],
+                identifier: /^inherit$/i
+            }               
+        ]    
+    },
+    "color-profile": 1,
+    "column-count": 1,
+    "column-fill": 1,
+    "column-gap": 1,
+    "column-rule": 1,
+    "column-rule-color": 1,
+    "column-rule-style": 1,
+    "column-rule-width": 1,
+    "column-span": 1,
+    "column-width": 1,
+    "columns": 1,
+    "content": 1,
+    "counter-increment": 1,
+    "counter-reset": 1,
+    "crop": 1,
+    "cue": 1,
+    "cue-after": 1,
+    "cue-before": 1,
+    "cursor": 1,
+    "direction": 1,
+    "display": 1,
+    "dominant-baseline": 1,
+    "drop-initial-after-adjust": 1,
+    "drop-initial-after-align": 1,
+    "drop-initial-before-adjust": 1,
+    "drop-initial-before-align": 1,
+    "drop-initial-size": 1,
+    "drop-initial-value": 1,
+    "elevation": 1,
+    "empty-cells": 1,
+    "fit": 1,
+    "fit-position": 1,
+    "float":  {
+        parts: [
+            {
+                types: ["identifier"],
+                identifier: /^(left|right|none|inherit)$/i
+            }               
+        ]    
+    },
+    
+    "float-offset": 1,
+    "font": 1,
+    "font-family": 1,
+    "font-size": 1,
+    "font-size-adjust": 1,
+    "font-stretch": 1,
+    "font-style": 1,
+    "font-variant": 1,
+    "font-weight": 1,
+    "grid-columns": 1,
+    "grid-rows": 1,
+    "hanging-punctuation": 1,
+    "height": Validation.measurement,
+    "hyphenate-after": 1,
+    "hyphenate-before": 1,
+    "hyphenate-character": 1,
+    "hyphenate-lines": 1,
+    "hyphenate-resource": 1,
+    "hyphens": 1,
+    "icon": 1,
+    "image-orientation": 1,
+    "image-rendering": 1,
+    "image-resolution": 1,
+    "inline-box-align": 1,
+    "left": Validation.measurement,
+    "letter-spacing": 1,
+    "line-height": 1,
+    "line-stacking": 1,
+    "line-stacking-ruby": 1,
+    "line-stacking-shift": 1,
+    "line-stacking-strategy": 1,
+    "list-style": 1,
+    "list-style-image": 1,
+    "list-style-position": 1,
+    "list-style-type": 1,
+    "margin": 1,
+    "margin-bottom": 1,
+    "margin-left": 1,
+    "margin-right": 1,
+    "margin-top": 1,
+    "mark": 1,
+    "mark-after": 1,
+    "mark-before": 1,
+    "marks": 1,
+    "marquee-direction": 1,
+    "marquee-play-count": 1,
+    "marquee-speed": 1,
+    "marquee-style": 1,
+    "max-height": 1,
+    "max-width": 1,
+    "min-height": 1,
+    "min-width": 1,
+    "move-to": 1,
+    "nav-down": 1,
+    "nav-index": 1,
+    "nav-left": 1,
+    "nav-right": 1,
+    "nav-up": 1,
+    "opacity": 1,
+    "orphans": 1,
+    "outline": 1,
+    "outline-color": 1,
+    "outline-offset": 1,
+    "outline-style": 1,
+    "outline-width": 1,
+    "overflow": 1,
+    "overflow-style": 1,
+    "overflow-x": 1,
+    "overflow-y": 1,
+    "padding": 1,
+    "padding-bottom": 1,
+    "padding-left": 1,
+    "padding-right": 1,
+    "padding-top": 1,
+    "page": 1,
+    "page-break-after": 1,
+    "page-break-before": 1,
+    "page-break-inside": 1,
+    "page-policy": 1,
+    "pause": 1,
+    "pause-after": 1,
+    "pause-before": 1,
+    "perspective": 1,
+    "perspective-origin": 1,
+    "phonemes": 1,
+    "pitch": 1,
+    "pitch-range": 1,
+    "play-during": 1,
+    "position": 1,
+    "presentation-level": 1,
+    "punctuation-trim": 1,
+    "quotes": 1,
+    "rendering-intent": 1,
+    "resize": 1,
+    "rest": 1,
+    "rest-after": 1,
+    "rest-before": 1,
+    "richness": 1,
+    "right": Validation.measurement,
+    "rotation": 1,
+    "rotation-point": 1,
+    "ruby-align": 1,
+    "ruby-overhang": 1,
+    "ruby-position": 1,
+    "ruby-span": 1,
+    "size": 1,
+    "speak": 1,
+    "speak-header": 1,
+    "speak-numeral": 1,
+    "speak-punctuation": 1,
+    "speech-rate": 1,
+    "stress": 1,
+    "string-set": 1,
+    "table-layout": 1,
+    "target": 1,
+    "target-name": 1,
+    "target-new": 1,
+    "target-position": 1,
+    "text-align": 1,
+    "text-align-last": 1,
+    "text-decoration": 1,
+    "text-emphasis": 1,
+    "text-height": 1,
+    "text-indent": 1,
+    "text-justify": 1,
+    "text-outline": 1,
+    "text-shadow": 1,
+    "text-transform": 1,
+    "text-wrap": 1,
+    "top": Validation.measurement,
+    "transform": 1,
+    "transform-origin": 1,
+    "transform-style": 1,
+    "transition": 1,
+    "transition-delay": 1,
+    "transition-duration": 1,
+    "transition-property": 1,
+    "transition-timing-function": 1,
+    "unicode-bidi": 1,
+    "vertical-align": 1,
+    "visibility": 1,
+    "voice-balance": 1,
+    "voice-duration": 1,
+    "voice-family": 1,
+    "voice-pitch": 1,
+    "voice-pitch-range": 1,
+    "voice-rate": 1,
+    "voice-stress": 1,
+    "voice-volume": 1,
+    "volume": 1,
+    "white-space": 1,
+    "white-space-collapse": 1,
+    "widows": 1,
+    "width": Validation.measurement,
+    "word-break": 1,
+    "word-spacing": {
+        minParts: 1,
+        maxParts: 1,
+        parts: [
+            {
+                types: ["length", "number", "identifier"],
+                identifier: /^(normal|inherit)$/,
+                number: /^0$/
+            }        
+        ]
+    },  
+    "word-wrap": 1,
+    "z-index": {
+        minParts: 1,
+        maxParts: 1,
+        parts: [
+            {
+                types: ["length", "identifier"],
+                identifier: /^(auto|inherit)$/
+            }        
+        ]
+    }
+
+    
+};
 /**
  * Represents a selector combinator (whitespace, +, >).
  * @namespace parserlib.css
@@ -3486,7 +3869,7 @@ nth
  */
 function PropertyName(text, hack, line, col){
     
-    SyntaxUnit.call(this, (hack||"") + text, line, col);
+    SyntaxUnit.call(this, text, line, col);
 
     /**
      * The type of IE hack applied ("*", "_", or null).
@@ -3499,8 +3882,9 @@ function PropertyName(text, hack, line, col){
 
 PropertyName.prototype = new SyntaxUnit();
 PropertyName.prototype.constructor = PropertyName;
-
-
+PropertyName.prototype.toString = function(){
+    return (this.hack ? this.hack : "") + this.text;
+};
 /**
  * Represents a single part of a CSS property value, meaning that it represents
  * just everything single part between ":" and ";". If there are multiple values
@@ -3528,7 +3912,6 @@ function PropertyValue(parts, line, col){
 
 PropertyValue.prototype = new SyntaxUnit();
 PropertyValue.prototype.constructor = PropertyValue;
-
 
 /**
  * Represents a single part of a CSS property value, meaning that it represents
@@ -3701,7 +4084,6 @@ function Selector(parts, line, col){
 Selector.prototype = new SyntaxUnit();
 Selector.prototype.constructor = Selector;
 
-
 /**
  * Represents a single part of a selector string, meaning a single set of
  * element name and modifiers. This does not include combinators such as
@@ -3743,7 +4125,6 @@ function SelectorPart(elementName, modifiers, text, line, col){
 SelectorPart.prototype = new SyntaxUnit();
 SelectorPart.prototype.constructor = SelectorPart;
 
-
 /**
  * Represents a selector modifier string, meaning a class name, element name,
  * element ID, pseudo rule, etc.
@@ -3778,7 +4159,6 @@ function SelectorSubPart(text, type, line, col){
 
 SelectorSubPart.prototype = new SyntaxUnit();
 SelectorSubPart.prototype.constructor = SelectorSubPart;
-
 
 
 
@@ -4779,7 +5159,6 @@ TokenStream.prototype = mix(new TokenStreamBase(), {
     }
 });
 
-
 var Tokens  = [
 
     /*
@@ -4986,7 +5365,42 @@ var Tokens  = [
 
 
 
+/**
+ * Type to use when a validation error occurs.
+ * @class ValidationError
+ * @namespace parserlib.util
+ * @constructor
+ * @param {String} message The error message.
+ * @param {int} line The line at which the error occurred.
+ * @param {int} col The column at which the error occurred.
+ */
+function ValidationError(message, line, col){
 
+    /**
+     * The column at which the error occurred.
+     * @type int
+     * @property col
+     */
+    this.col = col;
+
+    /**
+     * The line at which the error occurred.
+     * @type int
+     * @property line
+     */
+    this.line = line;
+
+    /**
+     * The text representation of the unit.
+     * @type String
+     * @property text
+     */
+    this.message = message;
+
+}
+
+//inherit from Error
+ValidationError.prototype = new Error();
 
 parserlib.css = {
 Colors              :Colors,    
@@ -5001,10 +5415,10 @@ Selector            :Selector,
 SelectorPart        :SelectorPart,
 SelectorSubPart     :SelectorSubPart,
 TokenStream         :TokenStream,
-Tokens              :Tokens
+Tokens              :Tokens,
+ValidationError     :ValidationError
 };
 })();
-
 /**
  * Main CSSLint object.
  * @class CSSLint
@@ -5039,6 +5453,15 @@ var CSSLint = (function(){
      */
     api.clearRules = function(){
         rules = [];
+    };
+    
+    /**
+     * Returns the rule objects.
+     * @return An array of rule objects.
+     * @method getRules
+     */
+    api.getRules = function(){
+        return [].concat(rules);
     };
 
     //-------------------------------------------------------------------------
@@ -5114,6 +5537,7 @@ var CSSLint = (function(){
             len     = rules.length,
             reporter,
             lines,
+            report,
             parser = new parserlib.css.Parser({ starHack: true, ieFilters: true,
                                                 underscoreHack: true, strict: false });
 
@@ -5142,10 +5566,23 @@ var CSSLint = (function(){
             reporter.error("Fatal error, cannot continue: " + ex.message, ex.line, ex.col);
         }
 
-        return {
+        report = {
             messages    : reporter.messages,
             stats       : reporter.stats
         };
+        
+        //sort by line numbers, rollups at the bottom
+        report.messages.sort(function (a, b){
+            if (a.rollup && !b.rollup){
+                return 1;
+            } else if (!a.rollup && b.rollup){
+                return -1;
+            } else {
+                return a.line - b.line;
+            }
+        });        
+        
+        return report;
     };
 
     //-------------------------------------------------------------------------
@@ -6119,6 +6556,7 @@ CSSLint.addRule({
                 "animation-delay": 1,
                 "animation-direction": 1,
                 "animation-duration": 1,
+                "animation-fill-mode": 1,
                 "animation-iteration-count": 1,
                 "animation-name": 1,
                 "animation-play-state": 1,
@@ -6367,6 +6805,8 @@ CSSLint.addRule({
                 "transition-property": 1,
                 "transition-timing-function": 1,
                 "unicode-bidi": 1,
+                "user-modify": 1,
+                "user-select": 1,
                 "vertical-align": 1,
                 "visibility": 1,
                 "voice-balance": 1,
@@ -6573,6 +7013,93 @@ CSSLint.addRule({
 
 });
 /*
+ * Rule: Use shorthand properties where possible.
+ * 
+ */
+
+CSSLint.addRule({
+
+    //rule information
+    id: "shorthand",
+    name: "Shorthand Properties",
+    desc: "Use shorthand properties where possible.",
+    browsers: "All",
+    
+    //initialization
+    init: function(parser, reporter){
+        var rule = this,
+            prop, i, len,
+            propertiesToCheck = {},
+            properties,
+            mapping = {
+                "margin": [
+                    "margin-top",
+                    "margin-bottom",
+                    "margin-left",
+                    "margin-right"
+                ],
+                "padding": [
+                    "padding-top",
+                    "padding-bottom",
+                    "padding-left",
+                    "padding-right"
+                ]              
+            };
+            
+        //initialize propertiesToCheck 
+        for (prop in mapping){
+            if (mapping.hasOwnProperty(prop)){
+                for (i=0, len=mapping[prop].length; i < len; i++){
+                    propertiesToCheck[mapping[prop][i]] = prop;
+                }
+            }
+        }
+            
+        function startRule(event){
+            properties = {};
+        }
+        
+        //event handler for end of rules
+        function endRule(event){
+            
+            var prop, i, len, total;
+            
+            //check which properties this rule has
+            for (prop in mapping){
+                if (mapping.hasOwnProperty(prop)){
+                    total=0;
+                    
+                    for (i=0, len=mapping[prop].length; i < len; i++){
+                        total += properties[mapping[prop][i]] ? 1 : 0;
+                    }
+                    
+                    if (total == mapping[prop].length){
+                        reporter.warn("The properties " + mapping[prop].join(", ") + " can be replaced by " + prop + ".", event.line, event.col, rule);
+                    }
+                }
+            }
+        }        
+        
+        parser.addListener("startrule", startRule);
+        parser.addListener("startfontface", startRule);
+    
+        //check for use of "font-size"
+        parser.addListener("property", function(event){
+            var name = event.property.toString().toLowerCase(),
+                value = event.value.parts[0].value;
+
+            if (propertiesToCheck[name]){
+                properties[name] = 1;
+            }
+        });
+
+        parser.addListener("endrule", endRule);
+        parser.addListener("endfontface", endRule);     
+
+    }
+
+});
+/*
  * Rule: Don't use text-indent for image replacement if you need to support rtl. 
  * 
  */
@@ -6590,17 +7117,39 @@ CSSLint.addRule({
     
     //initialization
     init: function(parser, reporter){
-        var rule = this;
+        var rule = this,
+            textIndent = false;
+            
+            
+        function startRule(event){
+            textIndent = false;
+        }
+        
+        //event handler for end of rules
+        function endRule(event){
+            if (textIndent){
+                reporter.warn("Negative text-indent doesn't work well with RTL. If you use text-indent for image replacement explicitly set text-direction for that item to ltr.", name.line, name.col, rule);
+            }
+        }        
+        
+        parser.addListener("startrule", startRule);
+        parser.addListener("startfontface", startRule);
     
         //check for use of "font-size"
         parser.addListener("property", function(event){
-            var name = event.property,
+            var name = event.property.toString().toLowerCase(),
                 value = event.value.parts[0].value;
 
             if (name == "text-indent" && value < -99){
-                reporter.warn("Negative text-indent doesn't work well with RTL. If you use text-indent for image replacement explicitly set text-direction for that item to ltr.", name.line, name.col, rule);
+                textIndent = true;
+            } else if (name == "direction" && value == "ltr"){
+                textIndent = false;
             }
         });
+
+        parser.addListener("endrule", endRule);
+        parser.addListener("endfontface", endRule);     
+
     }
 
 });
@@ -6632,20 +7181,48 @@ CSSLint.addRule({
             var selectors = event.selectors,
                 selector,
                 part,
-                i;
+                pseudo,
+                i, j;
 
             for (i=0; i < selectors.length; i++){
                 selector = selectors[i];
                 part = selector.parts[selector.parts.length-1];
 
-                if (part.elementName && /(h[1-6])/.test(part.elementName.toString())){
-                    headings[RegExp.$1]++;
-                    if (headings[RegExp.$1] > 1) {
-                        reporter.warn("Heading (" + part.elementName + ") has already been defined.", part.line, part.col, rule);
+                if (part.elementName && /(h[1-6])/i.test(part.elementName.toString())){
+                    
+                    for (j=0; j < part.modifiers.length; j++){
+                        if (part.modifiers[j].type == "pseudo"){
+                            pseudo = true;
+                            break;
+                        }
+                    }
+                
+                    if (!pseudo){
+                        headings[RegExp.$1]++;
+                        if (headings[RegExp.$1] > 1) {
+                            reporter.warn("Heading (" + part.elementName + ") has already been defined.", part.line, part.col, rule);
+                        }
                     }
                 }
             }
         });
+        
+        parser.addListener("endstylesheet", function(event){
+            var prop,
+                messages = [];
+                
+            for (var prop in headings){
+                if (headings.hasOwnProperty(prop)){
+                    if (headings[prop] > 1){
+                        messages.push(headings[prop] + " " + prop + "s");
+                    }
+                }
+            }
+            
+            if (messages.length){
+                reporter.rollupWarn("You have " + messages.join(", ") + " defined in this stylesheet.", rule);
+            }
+        });        
     }
 
 });
@@ -6701,24 +7278,64 @@ CSSLint.addRule({
             properties,
             num,
             propertiesToCheck = {
-                "-moz-border-radius": "border-radius",
                 "-webkit-border-radius": "border-radius",
                 "-webkit-border-top-left-radius": "border-top-left-radius",
                 "-webkit-border-top-right-radius": "border-top-right-radius",
                 "-webkit-border-bottom-left-radius": "border-bottom-left-radius",
                 "-webkit-border-bottom-right-radius": "border-bottom-right-radius",
+                
+                "-o-border-radius": "border-radius",
+                "-o-border-top-left-radius": "border-top-left-radius",
+                "-o-border-top-right-radius": "border-top-right-radius",
+                "-o-border-bottom-left-radius": "border-bottom-left-radius",
+                "-o-border-bottom-right-radius": "border-bottom-right-radius",
+                
+                "-moz-border-radius": "border-radius",
                 "-moz-border-radius-topleft": "border-top-left-radius",
                 "-moz-border-radius-topright": "border-top-right-radius",
                 "-moz-border-radius-bottomleft": "border-bottom-left-radius",
-                "-moz-border-radius-bottomright": "border-bottom-right-radius",
+                "-moz-border-radius-bottomright": "border-bottom-right-radius",                
+                
+                "-moz-column-count": "column-count",
+                "-webkit-column-count": "column-count",
+                
+                "-moz-column-gap": "column-gap",
+                "-webkit-column-gap": "column-gap",
+                
+                "-moz-column-rule": "column-rule",
+                "-webkit-column-rule": "column-rule",
+                
+                "-moz-column-rule-style": "column-rule-style",
+                "-webkit-column-rule-style": "column-rule-style",
+                
+                "-moz-column-rule-color": "column-rule-color",
+                "-webkit-column-rule-color": "column-rule-color",
+                
+                "-moz-column-rule-width": "column-rule-width",
+                "-webkit-column-rule-width": "column-rule-width",
+                
+                "-moz-column-width": "column-width",
+                "-webkit-column-width": "column-width",
+                
+                "-webkit-column-span": "column-span",
+                "-webkit-columns": "columns",
+                
                 "-moz-box-shadow": "box-shadow",
                 "-webkit-box-shadow": "box-shadow",
+                
                 "-moz-transform" : "transform",
                 "-webkit-transform" : "transform",
                 "-o-transform" : "transform",
                 "-ms-transform" : "transform",
+                
+                "-moz-transform-origin" : "transform-origin",
+                "-webkit-transform-origin" : "transform-origin",
+                "-o-transform-origin" : "transform-origin",
+                "-ms-transform-origin" : "transform-origin",
+                
                 "-moz-box-sizing" : "box-sizing",
                 "-webkit-box-sizing" : "box-sizing",
+                
                 "-moz-user-select" : "user-select",
                 "-khtml-user-select" : "user-select",
                 "-webkit-user-select" : "user-select"                
@@ -6857,6 +7474,50 @@ CSSLint.addRule({
 });
 CSSLint.addFormatter({
     //format information
+    id: "checkstyle-xml",
+    name: "Checkstyle XML format",
+
+    startFormat: function(){
+        return "<?xml version=\"1.0\" encoding=\"utf-8\"?><checkstyle>";
+    },
+
+    endFormat: function(){
+        return "</checkstyle>";
+    },
+
+    formatResults: function(results, filename) {
+        var messages = results.messages,
+            output = [];
+
+        /**
+         * Generate a source string for a rule.
+         * Checkstyle source strings usually resemble Java class names e.g
+         * net.csslint.SomeRuleName
+         * @param {Object} rule
+         * @return rule source as {String}
+         */
+        var generateSource = function(rule) {
+            return 'net.csslint.' + rule.name.replace(/\s/g,'');
+        };
+
+        if (messages.length > 0) {
+            output.push("<file name=\""+filename+"\">");
+            messages.forEach(function (message, i) {
+                if (message.rollup) {
+                    //ignore rollups for now
+                } else {
+                  output.push("<error line=\"" + message.line + "\" column=\"" + message.col + "\" severity=\"" + message.type + "\"" +
+                      " message=\"" + message.message + "\" source=\"" + generateSource(message.rule) +"\"/>");
+                }
+            });
+            output.push("</file>");
+        }
+
+        return output.join("");
+    }
+});
+CSSLint.addFormatter({
+    //format information
     id: "compact",
     name: "Compact, 'porcelain' format",
     
@@ -6884,17 +7545,6 @@ CSSLint.addFormatter({
         if (pos > -1){
             shortFilename = filename.substring(pos+1);
         }
-
-        //rollups at the bottom
-        messages.sort(function (a, b){
-            if (a.rollup && !b.rollup){
-                return 1;
-            } else if (!a.rollup && b.rollup){
-                return -1;
-            } else {
-                return 0;
-            }
-        });
 
         messages.forEach(function (message, i) {
             if (message.rollup) {
@@ -6944,16 +7594,6 @@ CSSLint.addFormatter({
         };
 
         if (messages.length > 0) {
-            //rollups at the bottom
-            messages.sort(function (a, b) {
-                if (a.rollup && !b.rollup) {
-                    return 1;
-                } else if (!a.rollup && b.rollup) {
-                    return -1;
-                } else {
-                    return 0;
-                }
-            });
         
             output.push("<file name=\""+filename+"\">");
             messages.forEach(function (message, i) {
@@ -6999,17 +7639,6 @@ CSSLint.addFormatter({
         if (pos > -1){
             shortFilename = filename.substring(pos+1);
         }
-
-        //rollups at the bottom
-        messages.sort(function (a, b){
-            if (a.rollup && !b.rollup){
-                return 1;
-            } else if (!a.rollup && b.rollup){
-                return -1;
-            } else {
-                return 0;
-            }
-        });
 
         messages.forEach(function (message, i) {
             output = output + "\n\n" + shortFilename;
