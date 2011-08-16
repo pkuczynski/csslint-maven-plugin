@@ -142,17 +142,21 @@ public class LintMojo extends AbstractMojo {
         addIncludesArgument(arguments);
 
         // Invoke script with specified arguments by means Rhino
-        int exitCode = Main.exec(arguments.
-                toArray(new String[arguments.size()]));
+        int exitCode = 0;
+
+        try {
+            exitCode = Main.exec(arguments.
+                    toArray(new String[arguments.size()]));
+        } catch (ExitScript e) {
+            if (scriptExitCode != 0) {
+                throw new IllegalStateException("There are errors in " +
+                        "your CSS files");
+            }
+        }
 
         if (exitCode != 0) {
             throw new IllegalStateException("Error occurs when " +
                     "executing CSS Lint tool");
-        }
-
-        if (scriptExitCode != 0) {
-            throw new IllegalStateException("There are errors in " +
-                    "your CSS files");
         }
     }
 
@@ -277,6 +281,9 @@ public class LintMojo extends AbstractMojo {
 
                 // Pass exit code from "csslint-rhino.js" script
                 scriptExitCode = exitCode;
+
+                // Prevent script from running (comes from Rhino examples)
+                throw new ExitScript();
             }
         });
     }
@@ -297,5 +304,12 @@ public class LintMojo extends AbstractMojo {
         return new RawInputStreamFacade(
                 LintMojo.class.getClassLoader()
                         .getResource(SCRIPT_FILE).openStream());
+    }
+
+    /**
+     * The main purpose is to mark that script wants exit with specified code.
+     */
+    static class ExitScript extends Error {
+
     }
 }
