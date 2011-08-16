@@ -1,10 +1,10 @@
-## Maven CSSLint plugin
+# Maven CSS Lint plugin
 
 The plugin has only one goal, called `check`. This action verifies all CSS files and fails a compilation process in case of an error.
 
 _Note:_ Plugin isn't available in Maven central repository yet.
 
-### Configuration
+## Configuration
 
 #### Schema
 
@@ -46,7 +46,7 @@ _Note:_ Plugin isn't available in Maven central repository yet.
        ...
     </project>
 
-### Parameters
+## Parameters
 
 ##### rules
 
@@ -96,11 +96,11 @@ The output format. Choose between `text` and `lint-xml`. `text` is console logge
 * Required: _No_
 * Default: _text_
 
-### Additional information
+#### Additional information
 
 * `check` goal is attached to `verify` phase;
 
-### Usage
+## Usage
 
 #### Verifying CSS files with all available rules
 
