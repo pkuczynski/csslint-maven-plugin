@@ -152,4 +152,4 @@ To check for CSS issues execute:
 
 ### Contributors
 
-1. Piotr Kucyzński
+1. Piotr Kuczyński
