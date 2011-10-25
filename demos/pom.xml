@@ -1,7 +1,7 @@
 <project>
    <modelVersion>4.0.0</modelVersion>
-   <groupId>csslint-maven-plugin.it</groupId>
-   <artifactId>test-single-file</artifactId>
+   <groupId>net.csslint</groupId>
+   <artifactId>demo</artifactId>
    <version>1.0</version>
 
    <build>
@@ -9,7 +9,7 @@
          <plugin>
             <groupId>net.csslint</groupId>
             <artifactId>csslint-maven-plugin</artifactId>
-            <version>0.5.0</version>
+            <version>0.7.0</version>
              <configuration>
                  <includes>
                      <include>file1.css</include>
