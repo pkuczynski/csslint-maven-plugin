@@ -17,7 +17,7 @@ _Note:_ Plugin isn't available in Maven central repository yet.
              <plugin>
                 <groupId>net.csslint</groupId>
                 <artifactId>csslint-maven-plugin</artifactId>
-                <version>0.5.0</version>
+                <version>0.7.0</version>
                 <configuration>
                    <rules>
                       <rule/>
@@ -117,7 +117,7 @@ The output format. Choose between `text` and `lint-xml`. `text` is console logge
              <plugin>
                 <groupId>net.csslint</groupId>
                 <artifactId>csslint-maven-plugin</artifactId>
-                <version>0.5.0</version>
+                <version>0.7.0</version>
                 <configuration>
                    <includes>
                       <include>src/main/webapp/WEB-INF/stylesheets</include>
