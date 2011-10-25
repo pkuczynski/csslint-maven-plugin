@@ -1,10 +1,10 @@
-## Maven CSSLint plugin
+# Maven CSS Lint plugin
 
 The plugin has only one goal, called `check`. This action verifies all CSS files and fails a compilation process in case of an error.
 
 _Note:_ Plugin isn't available in Maven central repository yet.
 
-### Configuration
+## Configuration
 
 #### Schema
 
@@ -17,7 +17,7 @@ _Note:_ Plugin isn't available in Maven central repository yet.
              <plugin>
                 <groupId>net.csslint</groupId>
                 <artifactId>csslint-maven-plugin</artifactId>
-                <version>0.4.0</version>
+                <version>0.5.0</version>
                 <configuration>
                    <rules>
                       <rule/>
@@ -46,7 +46,7 @@ _Note:_ Plugin isn't available in Maven central repository yet.
        ...
     </project>
 
-### Parameters
+## Parameters
 
 ##### rules
 
@@ -74,6 +74,8 @@ List of rules that the tool uses (if not specified all available rules are appli
 <tr><td>unique-headings</td><td>Heading should only be defined once</td></tr>
 <tr><td>vendor-prefix</td><td>Use vendor prefix properties correctly</td></tr>
 <tr><td>zero-units</td><td>Don't use units for 0 values</td></tr>
+<tr><td>known-properties</td><td>Require use of known properties</td></tr>
+<tr><td>universal-selector</td><td>Disallow universal selector</td></tr>
 </table>
 
 * Type: _List_
@@ -94,11 +96,11 @@ The output format. Choose between `text` and `lint-xml`. `text` is console logge
 * Required: _No_
 * Default: _text_
 
-### Additional information
+#### Additional information
 
 * `check` goal is attached to `verify` phase;
 
-### Usage
+## Usage
 
 #### Verifying CSS files with all available rules
 
@@ -115,7 +117,7 @@ The output format. Choose between `text` and `lint-xml`. `text` is console logge
              <plugin>
                 <groupId>net.csslint</groupId>
                 <artifactId>csslint-maven-plugin</artifactId>
-                <version>0.4.0</version>
+                <version>0.5.0</version>
                 <configuration>
                    <includes>
                       <include>src/main/webapp/WEB-INF/stylesheets</include>
@@ -150,4 +152,4 @@ To check for CSS issues execute:
 
 ### Contributors
 
-1. Piotr Kucyzński
+1. Piotr Kuczyński
