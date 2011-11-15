@@ -25,6 +25,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 package net.csslint.plugins.maven;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.FileUtils;
@@ -62,8 +63,7 @@ public class LintMojo extends AbstractMojo {
      * <li>adjoining-classes : Don't use adjoining classes</li>
      * <li>box-model : Beware of broken box model</li>
      * <li>compatible-vendor-prefixes : Use compatible vendor prefixes</li>
-     * <li>display-property-grouping : Use properties appropriate for
-     *     'display'</li>
+     * <li>display-property-grouping : Use properties appropriate for 'display'</li>
      * <li>duplicate-properties : Avoid duplicate properties</li>
      * <li>empty-rules : Disallow empty rules</li>
      * <li>floats : Don't use too many floats</li>
@@ -88,15 +88,30 @@ public class LintMojo extends AbstractMojo {
     private List<String> rules;
 
     /**
-     * List of files or directories that the tool processes.
+     * The directory to scan.
      * <p/>
-     * The path can be absolute or relative (to ${basedir}).
-     * Tool is looking for *.css files when directory is defined.
+     * The directory used by 'includes' and 'excludes' options.
+     *
+     * @parameter expression="${project.basedir}"
+     * @optional
+     */
+    private File baseDirectory;
+
+    /**
+     * List of includes patterns (Ant patterns).
      *
      * @parameter
      * @required
      */
     private List<String> includes;
+
+    /**
+     * List of excludes patterns (Ant patterns).
+     *
+     * @parameter
+     * @optional
+     */
+    private List<String> excludes;
 
     /**
      * Output format. Choose between "text" and "lint-xml".
@@ -145,8 +160,8 @@ public class LintMojo extends AbstractMojo {
         int exitCode = 0;
 
         try {
-            exitCode = Main.exec(arguments.
-                    toArray(new String[arguments.size()]));
+            exitCode =
+                    Main.exec(arguments.toArray(new String[arguments.size()]));
         } catch (ExitScript e) {
             if (scriptExitCode != 0) {
                 throw new IllegalStateException("There are errors in " +
@@ -168,7 +183,10 @@ public class LintMojo extends AbstractMojo {
     }
 
     private void addIncludesArgument(List<String> arguments) {
-        arguments.addAll(includes);
+        List<File> files = getFiles();
+        for (File file : files) {
+            arguments.add(file.getAbsolutePath());
+        }
     }
 
     private void addOutputArgument(List<String> arguments) {
@@ -305,6 +323,24 @@ public class LintMojo extends AbstractMojo {
                 LintMojo.class.getClassLoader()
                         .getResource(SCRIPT_FILE).openStream());
     }
+
+    @SuppressWarnings("unchecked")
+    private List<File> getFiles() {
+        String includesAsString = StringUtils.join(includes, ",");
+        String excludesAsString = StringUtils.join(excludes, ",");
+
+        try {
+            return (List<File>) FileUtils.getFiles(
+                    baseDirectory,
+                    includesAsString,
+                    excludesAsString,
+                    true
+            );
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     /**
      * The main purpose is to mark that script wants exit with specified code.

@@ -13,7 +13,7 @@
              <configuration>
                  <includes>
                      <include>file1.css</include>
-                     <include>dict1</include>
+                     <include>dict1/**/*.css</include>
                  </includes>
                  <format>lint-xml</format>
              </configuration>

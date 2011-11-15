@@ -24,10 +24,17 @@ _Note:_ Plugin isn't available in Maven central repository yet.
                       ...
                    </rules>
 
+                   <baseDirectory/>
+
                    <includes>
                       <include/>
                       ...
                    </includes>
+
+                   <excludes>
+                      <exclude/>
+                      ...
+                   </excludes>
 
                    <format/>
                 </configuration>
@@ -81,12 +88,27 @@ List of rules that the tool uses (if not specified all available rules are appli
 * Type: _List_
 * Required: _No_
 
+##### baseDirectory
+
+The directory to scan. The directory used by 'includes' and 'excludes' options.
+
+* Type: _List_
+* Required: _No_
+* Default: _${project.basedir}_
+
 ##### includes
 
-List of files or directories that the tool processes. The path can be absolute or relative (to `${basedir}`). Plugin is looking for `*.css` files when directory is defined.
+List of includes patterns (Ant patterns). For more information about pattern format check [documentation]:(http://ant.apache.org/manual/dirtasks.html#patterns).
 
 * Type: _List_
 * Required: _Yes_
+
+##### excludes
+
+List of excludes patterns (Ant patterns). For more information about pattern format check [documentation]:(http://ant.apache.org/manual/dirtasks.html#patterns).
+
+* Type: _List_
+* Required: _No_
 
 ##### format
 
@@ -120,7 +142,7 @@ The output format. Choose between `text` and `lint-xml`. `text` is console logge
                 <version>0.7.0</version>
                 <configuration>
                    <includes>
-                      <include>src/main/webapp/WEB-INF/stylesheets</include>
+                      <include>**/*.css</include>
                    </includes>
                 </configuration>
                 <executions>
