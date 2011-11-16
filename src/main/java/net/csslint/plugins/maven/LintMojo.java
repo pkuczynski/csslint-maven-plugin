@@ -206,8 +206,8 @@ public class LintMojo extends AbstractMojo {
         // Build arguments list
         addScriptArgument(arguments);
         addErrorsAndWarningsArguments(arguments);
-        addOutputArgument(arguments);
-        addIncludesArgument(arguments);
+        addFormatArgument(arguments);
+        addFilesArguments(arguments);
 
         // Invoke script with specified arguments by means Rhino
 
@@ -232,16 +232,30 @@ public class LintMojo extends AbstractMojo {
         }
     }
 
-    private void addIncludesArgument(List<String> arguments) {
+    private void addFilesArguments(List<String> arguments) {
+        assert arguments != null;
+
         List<File> files = getFiles();
         for (File file : files) {
             arguments.add(file.getAbsolutePath());
         }
     }
 
-    private void addOutputArgument(List<String> arguments) throws MojoExecutionException {
+    private void addFormatArgument(List<String> arguments) throws MojoExecutionException {
         assert arguments != null;
 
+        // Console logger
+        if ("text".equals(format)
+                || "compact".equals(format)) {
+
+            getLog().debug(String.format("Use console logger, format='%s'", format));
+
+            arguments.add("--format=" + format);
+
+            return;
+        }
+
+        // File logger
         if ("lint-xml".equals(format)
                 || "csslint-xml".equals(format)
                 || "checkstyle-xml".equals(format)) {
@@ -255,17 +269,6 @@ public class LintMojo extends AbstractMojo {
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
-
-            return;
-        }
-
-        if ("text".equals(format)
-                || "compact".equals(format)) {
-
-            getLog().debug(String.format("Use console logger, format='%s'", format));
-
-//            arguments.add("--format=" + format);
-            arguments.add("--list-rules");
 
             return;
         }
@@ -293,6 +296,10 @@ public class LintMojo extends AbstractMojo {
     }
 
     private void addRulesToCustomArgument(String argumentName , List<String> rules, List<String> arguments) {
+        assert argumentName != null;
+        assert rules != null;
+        assert arguments != null;
+
         StringBuilder sb = new StringBuilder();
 
         sb.append(argumentName);
@@ -309,6 +316,8 @@ public class LintMojo extends AbstractMojo {
     }
 
     private void addScriptArgument(List<String> arguments) {
+        assert arguments != null;
+
         File script = getFileFromBuildDirectory(SCRIPT_FILE);
 
         /*
@@ -368,7 +377,7 @@ public class LintMojo extends AbstractMojo {
         Main.getGlobal().initQuitAction(new QuitAction() {
 
             @Override
-            public void quit(Context cx, int scriptExitCode) {
+            public void quit(Context context, int scriptExitCode) {
 
                 /*
                     Pass exit code from "csslint-rhino.js" script.
@@ -381,6 +390,7 @@ public class LintMojo extends AbstractMojo {
     }
 
     private File getFileFromBuildDirectory(String path) {
+        assert path != null;
         return new File(projectBuildDirectory, path);
     }
 
@@ -389,6 +399,7 @@ public class LintMojo extends AbstractMojo {
     }
 
     private void extractFileFromClasspath(File script) throws IOException {
+        assert script != null;
         FileUtils.copyStreamToFile(getScriptAsInputStream(), script);
     }
 
