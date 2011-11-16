@@ -154,7 +154,22 @@ List of excludes patterns (Ant patterns). For more information about pattern for
 
 ##### format
 
-The output format. Choose between `text` and `lint-xml`. `text` is console logger. `lint-xml` is XML file logger (the location of the file is `${project.build.directory}/csslint.xml`).
+The output format.
+
+Console formats:
+
+<table>
+<tr><td>text</td><td>the default format</td></tr>
+<tr><td>compact</td><td>a more condensed output where each warning takes only one line of output</td></tr>
+</table>
+
+External file formats (the location of the file is "${project.build.directory}/csslint.xml"):
+
+<table>
+<tr><td>lint-xml</td><td>an XML format that can be consumed by other utilities</td></tr>
+<tr><td>csslint-xml</td><td>same as lint-xml except the document element is &lt;csslint&gt;</td></tr>
+<tr><td>checkstyle-xml</td><td>a format appropriate for consumption by Checkstyle</td></tr>
+</table>
 
 * Type: _String_
 * Required: _No_

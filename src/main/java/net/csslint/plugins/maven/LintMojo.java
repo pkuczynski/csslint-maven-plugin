@@ -153,16 +153,22 @@ public class LintMojo extends AbstractMojo {
     private List<String> excludes;
 
     /**
-     * Output format. Choose between "text" and "lint-xml".
+     * Output format.
      * <p/>
-     * Formats:
+     * Console formats:
      * <ul>
-     * <li>"text" is console logger</li>
-     * <li>"lint-xml" is XML file logger (the location of the
-     *     file is "${project.build.directory}/csslint.xml")</li>
+     * <li>"text" - the default format</li>
+     * <li>"compact" - a more condensed output where each warning takes only one line of output</li>
      * </ul>
-     *
-     * @parameter
+     * <p/>
+     * External file formats (the location of the file is "${project.build.directory}/csslint.xml"):
+     * <ul>
+     * <li>"lint-xml" - an XML format that can be consumed by other utilities</li>
+     * <li>"csslint-xml" - same as lint-xml except the document element is &lt;csslint&gt;</li>
+     * <li>"checkstyle-xml" -  a format appropriate for consumption by Checkstyle</li>
+     * </ul>
+
+     * @parameter expression="text"
      * @optional
      */
     private String format;
@@ -228,11 +234,14 @@ public class LintMojo extends AbstractMojo {
         }
     }
 
-    private void addOutputArgument(List<String> arguments) {
+    private void addOutputArgument(List<String> arguments) throws MojoExecutionException {
         assert arguments != null;
 
-        if ("lint-xml".equals(format)) {
-            getLog().debug("Use XML file logger");
+        if ("lint-xml".equals(format)
+                || "csslint-xml".equals(format)
+                || "checkstyle-xml".equals(format)) {
+
+            getLog().debug(String.format("Use file logger, format='%s'", format));
 
             arguments.add("--format=" + format);
 
@@ -241,9 +250,21 @@ public class LintMojo extends AbstractMojo {
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
-        } else {
-            getLog().debug("Use console logger");
+
+            return;
         }
+
+        if ("text".equals(format)
+                || "compact".equals(format)) {
+
+            getLog().debug(String.format("Use console logger, format='%s'", format));
+
+            arguments.add("--format=" + format);
+
+            return;
+        }
+
+        throw new MojoExecutionException("Unknown output format");
     }
 
     private void addErrorsAndWarningsArguments(List<String> arguments) {

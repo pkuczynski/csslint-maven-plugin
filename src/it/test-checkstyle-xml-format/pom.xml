@@ -1,7 +1,7 @@
 <project>
    <modelVersion>4.0.0</modelVersion>
    <groupId>csslint-maven-plugin.it</groupId>
-   <artifactId>test-explcit-text-format</artifactId>
+   <artifactId>test-checkstyle-xml-format</artifactId>
    <version>1.0</version>
 
    <build>
@@ -14,7 +14,7 @@
                  <includes>
                      <include>file1.css</include>
                  </includes>
-                 <format>text</format>
+                 <format>checkstyle-xml</format>
              </configuration>
             <executions>
                <execution>
