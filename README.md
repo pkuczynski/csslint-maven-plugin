@@ -148,14 +148,14 @@ The directory to scan. The directory used by 'includes' and 'excludes' options.
 
 ##### includes
 
-List of includes patterns (Ant patterns). For more information about pattern format check [documentation]:(http://ant.apache.org/manual/dirtasks.html#patterns).
+List of includes patterns (Ant patterns). For more information about pattern's syntax check documentation: http://ant.apache.org/manual/dirtasks.html#patterns
 
 * Type: _List_
 * Required: _Yes_
 
 ##### excludes
 
-List of excludes patterns (Ant patterns). For more information about pattern format check [documentation]:(http://ant.apache.org/manual/dirtasks.html#patterns).
+List of excludes patterns (Ant patterns). For more information about pattern's syntax check documentation: http://ant.apache.org/manual/dirtasks.html#patterns
 
 * Type: _List_
 * Required: _No_
@@ -171,7 +171,7 @@ Console formats:
 <tr><td>compact</td><td>a more condensed output where each warning takes only one line of output</td></tr>
 </table>
 
-External file formats (the location of the file is "${project.build.directory}/csslint.xml"):
+External file formats (the location of the file is `${project.build.directory}/csslint.xml`):
 
 <table>
 <tr><td>lint-xml</td><td>an XML format that can be consumed by other utilities</td></tr>
