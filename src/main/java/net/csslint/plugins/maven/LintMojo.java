@@ -53,34 +53,39 @@ public class LintMojo extends AbstractMojo {
     private static final String OUTPUT_FILE = "csslint.xml";
 
     /**
-     * TODO Update rule list
-     *
      * List of rules that the tool uses.
      * <p/>
      * If the rule is matched, an error message is produced. Errors cause build failure.
      * <p/>
      * Available rules:
      * <ul>
-     * <li>adjoining-classes : Don't use adjoining classes</li>
-     * <li>box-model : Beware of broken box model</li>
-     * <li>compatible-vendor-prefixes : Use compatible vendor prefixes</li>
-     * <li>display-property-grouping : Use properties appropriate for 'display'</li>
-     * <li>duplicate-properties : Avoid duplicate properties</li>
-     * <li>empty-rules : Disallow empty rules</li>
-     * <li>floats : Don't use too many floats</li>
-     * <li>font-faces : Don't use too many web fonts</li>
-     * <li>font-sizes : Don't use too many font sizes</li>
-     * <li>gradients : Include all gradient definitions</li>
-     * <li>ids : Don't use IDs</li>
-     * <li>import : Avoid '@import'</li>
-     * <li>important : Disallow '!important'</li>
-     * <li>overqualified-elements : Don't use overqualified elements</li>
-     * <li>qualified-headings : Don't qualify headings</li>
-     * <li>regex-selectors : Don't use selectors that look like regexs</li>
-     * <li>text-indent : Don't use negative text-indent'</li>
-     * <li>unique-headings : Heading should only be defined once</li>
-     * <li>vendor-prefix : Use vendor prefix properties correctly</li>
-     * <li>zero-units : Don't use units for 0 values</li>
+     * <li>adjoining-classes : Don't use adjoining classes.</li>
+     * <li>box-model : Don't use width or height when using padding or border.</li>
+     * <li>box-sizing : The box-sizing properties isn't supported in IE6 and IE7.</li>
+     * <li>compatible-vendor-prefixes : Include all compatible vendor prefixes to reach a wider range of users.</li>
+     * <li>display-property-grouping : Certain properties shouldn't be used with certain display property values.</li>
+     * <li>duplicate-properties : Duplicate properties must appear one after the other.</li>
+     * <li>empty-rules : Rules without any properties specified should be removed.</li>
+     * <li>errors : This rule looks for recoverable syntax errors.</li>
+     * <li>floats : This rule tests if the float property is used too many times</li>
+     * <li>font-faces : Too many different web fonts in the same stylesheet.</li>
+     * <li>font-sizes : Checks the number of font-size declarations.</li>
+     * <li>gradients : When using a vendor-prefixed gradient, make sure to use them all.</li>
+     * <li>ids : Selectors should not contain IDs.</li>
+     * <li>import : Don't use @import, use <link> instead.</li>
+     * <li>important : Be careful when using !important declaration</li>
+     * <li>known-properties : Properties should be known (listed in CSS specification) or be a vendor-prefixed property.</li>
+     * <li>outline-none : Use of outline: none or outline: 0 should be limited to :focus rules.</li>
+     * <li>overqualified-elements : Don't use classes or IDs with elements (a.foo or a#foo).</li>
+     * <li>qualified-headings : Headings should not be qualified (namespaced).</li>
+     * <li>regex-selectors : Selectors that look like regular expressions are slow and should be avoided.</li>
+     * <li>rules-count : Track how many rules there are.</li>
+     * <li>shorthand : Use shorthand properties where possible.</li>
+     * <li>text-indent : Checks for text indent less than -99px</li>
+     * <li>unique-headings : Headings should be defined only once.</li>
+     * <li>universal-selector : The universal selector (*) is known to be slow.</li>
+     * <li>vendor-prefix : When using a vendor-prefixed property, make sure to include the standard one.</li>
+     * <li>zero-units : You don't need to specify units when a value is 0.</li>
      * </ul>
      *
      * @parameter
@@ -89,34 +94,39 @@ public class LintMojo extends AbstractMojo {
     private List<String> errors;
 
     /**
-     * TODO Update rule list
-     *
      * List of rules that the tool uses (if not specified all available rules are applied).
      * <p/>
      * If the rule is matched, a warning message is produced. Warnings don't cause build failure.
      * <p/>
      * Available rules:
      * <ul>
-     * <li>adjoining-classes : Don't use adjoining classes</li>
-     * <li>box-model : Beware of broken box model</li>
-     * <li>compatible-vendor-prefixes : Use compatible vendor prefixes</li>
-     * <li>display-property-grouping : Use properties appropriate for 'display'</li>
-     * <li>duplicate-properties : Avoid duplicate properties</li>
-     * <li>empty-rules : Disallow empty rules</li>
-     * <li>floats : Don't use too many floats</li>
-     * <li>font-faces : Don't use too many web fonts</li>
-     * <li>font-sizes : Don't use too many font sizes</li>
-     * <li>gradients : Include all gradient definitions</li>
-     * <li>ids : Don't use IDs</li>
-     * <li>import : Avoid '@import'</li>
-     * <li>important : Disallow '!important'</li>
-     * <li>overqualified-elements : Don't use overqualified elements</li>
-     * <li>qualified-headings : Don't qualify headings</li>
-     * <li>regex-selectors : Don't use selectors that look like regexs</li>
-     * <li>text-indent : Don't use negative text-indent'</li>
-     * <li>unique-headings : Heading should only be defined once</li>
-     * <li>vendor-prefix : Use vendor prefix properties correctly</li>
-     * <li>zero-units : Don't use units for 0 values</li>
+     * <li>adjoining-classes : Don't use adjoining classes.</li>
+     * <li>box-model : Don't use width or height when using padding or border.</li>
+     * <li>box-sizing : The box-sizing properties isn't supported in IE6 and IE7.</li>
+     * <li>compatible-vendor-prefixes : Include all compatible vendor prefixes to reach a wider range of users.</li>
+     * <li>display-property-grouping : Certain properties shouldn't be used with certain display property values.</li>
+     * <li>duplicate-properties : Duplicate properties must appear one after the other.</li>
+     * <li>empty-rules : Rules without any properties specified should be removed.</li>
+     * <li>errors : This rule looks for recoverable syntax errors.</li>
+     * <li>floats : This rule tests if the float property is used too many times</li>
+     * <li>font-faces : Too many different web fonts in the same stylesheet.</li>
+     * <li>font-sizes : Checks the number of font-size declarations.</li>
+     * <li>gradients : When using a vendor-prefixed gradient, make sure to use them all.</li>
+     * <li>ids : Selectors should not contain IDs.</li>
+     * <li>import : Don't use @import, use <link> instead.</li>
+     * <li>important : Be careful when using !important declaration</li>
+     * <li>known-properties : Properties should be known (listed in CSS specification) or be a vendor-prefixed property.</li>
+     * <li>outline-none : Use of outline: none or outline: 0 should be limited to :focus rules.</li>
+     * <li>overqualified-elements : Don't use classes or IDs with elements (a.foo or a#foo).</li>
+     * <li>qualified-headings : Headings should not be qualified (namespaced).</li>
+     * <li>regex-selectors : Selectors that look like regular expressions are slow and should be avoided.</li>
+     * <li>rules-count : Track how many rules there are.</li>
+     * <li>shorthand : Use shorthand properties where possible.</li>
+     * <li>text-indent : Checks for text indent less than -99px</li>
+     * <li>unique-headings : Headings should be defined only once.</li>
+     * <li>universal-selector : The universal selector (*) is known to be slow.</li>
+     * <li>vendor-prefix : When using a vendor-prefixed property, make sure to include the standard one.</li>
+     * <li>zero-units : You don't need to specify units when a value is 0.</li>
      * </ul>
      *
      * @parameter
@@ -155,15 +165,15 @@ public class LintMojo extends AbstractMojo {
      * <p/>
      * Console formats:
      * <ul>
-     * <li>"text" - the default format</li>
-     * <li>"compact" - a more condensed output where each warning takes only one line of output</li>
+     * <li>"text" : the default format</li>
+     * <li>"compact" : a more condensed output where each warning takes only one line of output</li>
      * </ul>
      * <p/>
      * External file formats (the location of the file is "${project.build.directory}/csslint.xml"):
      * <ul>
-     * <li>"lint-xml" - an XML format that can be consumed by other utilities</li>
-     * <li>"csslint-xml" - same as lint-xml except the document element is &lt;csslint&gt;</li>
-     * <li>"checkstyle-xml" -  a format appropriate for consumption by Checkstyle</li>
+     * <li>"lint-xml" : an XML format that can be consumed by other utilities</li>
+     * <li>"csslint-xml" : same as lint-xml except the document element is &lt;csslint&gt;</li>
+     * <li>"checkstyle-xml" :  a format appropriate for consumption by Checkstyle</li>
      * </ul>
 
      * @parameter expression="text"
@@ -254,7 +264,8 @@ public class LintMojo extends AbstractMojo {
 
             getLog().debug(String.format("Use console logger, format='%s'", format));
 
-            arguments.add("--format=" + format);
+//            arguments.add("--format=" + format);
+            arguments.add("--list-rules");
 
             return;
         }
