@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.csslint</groupId>
     <artifactId>csslint-maven-plugin</artifactId>
-    <version>0.5.0</version>
+    <version>0.8.1</version>
     <packaging>maven-plugin</packaging>
 
     <description>
@@ -14,6 +14,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <csslint.version>${project.version}</csslint.version>
     </properties>
 
     <profiles>
@@ -148,7 +149,7 @@
                     before you build this plugin (csslint-rhino.js is
                     included into package)
                 -->
-                <directory>${basedir}/csslint</directory>
+                <directory>${basedir}/csslint/${csslint.version}</directory>
                 <includes>
                     <include>csslint-rhino.js</include>
                 </includes>
@@ -174,6 +175,12 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.0.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
         </dependency>
 
         <dependency>

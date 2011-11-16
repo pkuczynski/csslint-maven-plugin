@@ -1,7 +1,7 @@
 <project>
    <modelVersion>4.0.0</modelVersion>
    <groupId>csslint-maven-plugin.it</groupId>
-   <artifactId>test-multiple-files</artifactId>
+   <artifactId>test-custom-warning-rules</artifactId>
    <version>1.0</version>
 
    <build>
@@ -11,10 +11,16 @@
             <artifactId>csslint-maven-plugin</artifactId>
             <version>@project.version@</version>
              <configuration>
+                 <errors>
+                    <error>ids</error>
+                    <error>important</error>
+                    <error>import</error>
+                 </errors>
+
                  <includes>
                      <include>file1.css</include>
-                     <include>dict1/**/*.css</include>
                  </includes>
+
                  <format>lint-xml</format>
              </configuration>
             <executions>

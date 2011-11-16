@@ -17,17 +17,29 @@ _Note:_ Plugin isn't available in Maven central repository yet.
              <plugin>
                 <groupId>net.csslint</groupId>
                 <artifactId>csslint-maven-plugin</artifactId>
-                <version>0.5.0</version>
+                <version>0.8.1</version>
                 <configuration>
-                   <rules>
-                      <rule/>
+                   <errors>
+                      <error/>
                       ...
-                   </rules>
+                   </errors>
+
+                   <warnings>
+                     <warning/>
+                     ...
+                   </warnings>
+
+                   <baseDirectory/>
 
                    <includes>
                       <include/>
                       ...
                    </includes>
+
+                   <excludes>
+                      <exclude/>
+                      ...
+                   </excludes>
 
                    <format/>
                 </configuration>
@@ -48,49 +60,124 @@ _Note:_ Plugin isn't available in Maven central repository yet.
 
 ## Parameters
 
-##### rules
+##### errors
 
-List of rules that the tool uses (if not specified all available rules are applied). Available rules:
+List of rules that the tool uses. If the rule is matched, an error message is produced. Errors cause build failure. Errors tag has higher priority then warnings tag.
+
+Available rules:
 
 <table>
-<tr><td><strong>ID</strong></td><td><strong>Description</strong></td></tr>
-<tr><td>adjoining-classes</td><td>Don't use adjoining classes</td></tr>
-<tr><td>box-model</td><td>Beware of broken box model</td></tr>
-<tr><td>compatible-vendor-prefixes</td><td>Use compatible vendor prefixes</td></tr>
-<tr><td>display-property-grouping</td><td>Use properties appropriate for <code>display</code></td></tr>
-<tr><td>duplicate-properties</td><td>Avoid duplicate properties</td></tr>
-<tr><td>empty-rules</td><td>Disallow empty rules</td></tr>
-<tr><td>floats</td><td>Don't use too many floats</td></tr>
-<tr><td>font-faces</td><td>Don't use too many web fonts</td></tr>
-<tr><td>font-sizes</td><td>Don't use too many font sizes</td></tr>
-<tr><td>gradients</td><td>Include all gradient definitions</td></tr>
-<tr><td>ids</td><td>Don't use IDs</td></tr>
-<tr><td>import</td><td>Avoid <code>@import</code></td></tr>
-<tr><td>important</td><td>Disallow <code>!important</code></td></tr>
-<tr><td>overqualified-elements</td><td>Don't use overqualified elements</td></tr>
-<tr><td>qualified-headings</td><td>Don't qualify headings</td></tr>
-<tr><td>regex-selectors</td><td>Don't use selectors that look like regexs</td></tr>
-<tr><td>text-indent</td><td>Don't use negative <code>text-indent</code></td></tr>
-<tr><td>unique-headings</td><td>Heading should only be defined once</td></tr>
-<tr><td>vendor-prefix</td><td>Use vendor prefix properties correctly</td></tr>
-<tr><td>zero-units</td><td>Don't use units for 0 values</td></tr>
-<tr><td>known-properties</td><td>Require use of known properties</td></tr>
-<tr><td>universal-selector</td><td>Disallow universal selector</td></tr>
+<tr><td>adjoining-classes</td><td>Don't use adjoining classes.</td></tr>
+<tr><td>box-model</td><td>Don't use width or height when using padding or border.</td></tr>
+<tr><td>box-sizing</td><td>The box-sizing properties isn't supported in IE6 and IE7.</td></tr>
+<tr><td>compatible-vendor-prefixes</td><td>Include all compatible vendor prefixes to reach a wider range of users.</td></tr>
+<tr><td>display-property-grouping</td><td>Certain properties shouldn't be used with certain display property values.</td></tr>
+<tr><td>duplicate-properties</td><td>Duplicate properties must appear one after the other.</td></tr>
+<tr><td>empty-rules</td><td>Rules without any properties specified should be removed.</td></tr>
+<tr><td>errors</td><td>This rule looks for recoverable syntax errors.</td></tr>
+<tr><td>floats</td><td>This rule tests if the float property is used too many times</td></tr>
+<tr><td>font-faces</td><td>Too many different web fonts in the same stylesheet.</td></tr>
+<tr><td>font-sizes</td><td>Checks the number of font-size declarations.</td></tr>
+<tr><td>gradients</td><td>When using a vendor-prefixed gradient, make sure to use them all.</td></tr>
+<tr><td>ids</td><td>Selectors should not contain IDs.</td></tr>
+<tr><td>import</td><td>Don't use @import, use <link> instead.</td></tr>
+<tr><td>important</td><td>Be careful when using !important declaration</td></tr>
+<tr><td>known-properties</td><td>Properties should be known (listed in CSS specification) or be a vendor-prefixed property.</td></tr>
+<tr><td>outline-none</td><td>Use of outline: none or outline: 0 should be limited to :focus rules.</td></tr>
+<tr><td>overqualified-elements</td><td>Don't use classes or IDs with elements (a.foo or a#foo).</td></tr>
+<tr><td>qualified-headings</td><td>Headings should not be qualified (namespaced).</td></tr>
+<tr><td>regex-selectors</td><td>Selectors that look like regular expressions are slow and should be avoided.</td></tr>
+<tr><td>rules-count</td><td>Track how many rules there are.</td></tr>
+<tr><td>shorthand</td><td>Use shorthand properties where possible.</td></tr>
+<tr><td>text-indent</td><td>Checks for text indent less than -99px</td></tr>
+<tr><td>unique-headings</td><td>Headings should be defined only once.</td></tr>
+<tr><td>universal-selector</td><td>The universal selector (*) is known to be slow.</td></tr>
+<tr><td>vendor-prefix</td><td>When using a vendor-prefixed property, make sure to include the standard one.</td></tr>
+<tr><td>zero-units</td><td>You don't need to specify units when a value is 0.</td></tr>
 </table>
 
 * Type: _List_
 * Required: _No_
 
+##### warnings
+
+List of rules that the tool uses (if not specified all available rules are applied). If the rule is matched, a warning message is produced. Warnings don't cause build failure.
+
+Available rules:
+
+<table>
+<tr><td>adjoining-classes</td><td>Don't use adjoining classes.</td></tr>
+<tr><td>box-model</td><td>Don't use width or height when using padding or border.</td></tr>
+<tr><td>box-sizing</td><td>The box-sizing properties isn't supported in IE6 and IE7.</td></tr>
+<tr><td>compatible-vendor-prefixes</td><td>Include all compatible vendor prefixes to reach a wider range of users.</td></tr>
+<tr><td>display-property-grouping</td><td>Certain properties shouldn't be used with certain display property values.</td></tr>
+<tr><td>duplicate-properties</td><td>Duplicate properties must appear one after the other.</td></tr>
+<tr><td>empty-rules</td><td>Rules without any properties specified should be removed.</td></tr>
+<tr><td>errors</td><td>This rule looks for recoverable syntax errors.</td></tr>
+<tr><td>floats</td><td>This rule tests if the float property is used too many times</td></tr>
+<tr><td>font-faces</td><td>Too many different web fonts in the same stylesheet.</td></tr>
+<tr><td>font-sizes</td><td>Checks the number of font-size declarations.</td></tr>
+<tr><td>gradients</td><td>When using a vendor-prefixed gradient, make sure to use them all.</td></tr>
+<tr><td>ids</td><td>Selectors should not contain IDs.</td></tr>
+<tr><td>import</td><td>Don't use @import, use <link> instead.</td></tr>
+<tr><td>important</td><td>Be careful when using !important declaration</td></tr>
+<tr><td>known-properties</td><td>Properties should be known (listed in CSS specification) or be a vendor-prefixed property.</td></tr>
+<tr><td>outline-none</td><td>Use of outline: none or outline: 0 should be limited to :focus rules.</td></tr>
+<tr><td>overqualified-elements</td><td>Don't use classes or IDs with elements (a.foo or a#foo).</td></tr>
+<tr><td>qualified-headings</td><td>Headings should not be qualified (namespaced).</td></tr>
+<tr><td>regex-selectors</td><td>Selectors that look like regular expressions are slow and should be avoided.</td></tr>
+<tr><td>rules-count</td><td>Track how many rules there are.</td></tr>
+<tr><td>shorthand</td><td>Use shorthand properties where possible.</td></tr>
+<tr><td>text-indent</td><td>Checks for text indent less than -99px</td></tr>
+<tr><td>unique-headings</td><td>Headings should be defined only once.</td></tr>
+<tr><td>universal-selector</td><td>The universal selector (*) is known to be slow.</td></tr>
+<tr><td>vendor-prefix</td><td>When using a vendor-prefixed property, make sure to include the standard one.</td></tr>
+<tr><td>zero-units</td><td>You don't need to specify units when a value is 0.</td></tr>
+</table>
+
+* Type: _List_
+* Required: _No_
+
+##### baseDirectory
+
+The directory to scan. The directory used by 'includes' and 'excludes' options.
+
+* Type: _List_
+* Required: _No_
+* Default: _${project.basedir}_
+
 ##### includes
 
-List of files or directories that the tool processes. The path can be absolute or relative (to `${basedir}`). Plugin is looking for `*.css` files when directory is defined.
+List of includes patterns (Ant patterns). For more information about pattern's syntax check [documentation](http://ant.apache.org/manual/dirtasks.html#patterns).
 
 * Type: _List_
 * Required: _Yes_
 
+##### excludes
+
+List of excludes patterns (Ant patterns). For more information about pattern's syntax check [documentation](http://ant.apache.org/manual/dirtasks.html#patterns).
+
+* Type: _List_
+* Required: _No_
+
 ##### format
 
-The output format. Choose between `text` and `lint-xml`. `text` is console logger. `lint-xml` is XML file logger (the location of the file is `${project.build.directory}/csslint.xml`).
+The output format.
+
+Console formats:
+
+<table>
+<tr><td>text</td><td>the default format</td></tr>
+<tr><td>compact</td><td>a more condensed output where each warning takes only one line of output</td></tr>
+</table>
+
+External file formats (the location of the file is `${project.build.directory}/csslint.xml`):
+
+<table>
+<tr><td>lint-xml</td><td>an XML format that can be consumed by other utilities</td></tr>
+<tr><td>csslint-xml</td><td>same as lint-xml except the document element is &lt;csslint&gt;</td></tr>
+<tr><td>checkstyle-xml</td><td>a format appropriate for consumption by Checkstyle</td></tr>
+</table>
 
 * Type: _String_
 * Required: _No_
@@ -117,10 +204,10 @@ The output format. Choose between `text` and `lint-xml`. `text` is console logge
              <plugin>
                 <groupId>net.csslint</groupId>
                 <artifactId>csslint-maven-plugin</artifactId>
-                <version>0.5.0</version>
+                <version>0.8.1</version>
                 <configuration>
                    <includes>
-                      <include>src/main/webapp/WEB-INF/stylesheets</include>
+                      <include>**/*.css</include>
                    </includes>
                 </configuration>
                 <executions>

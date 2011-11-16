@@ -1,7 +1,7 @@
 <project>
    <modelVersion>4.0.0</modelVersion>
    <groupId>csslint-maven-plugin.it</groupId>
-   <artifactId>test-multiple-files</artifactId>
+   <artifactId>test-csslint-xml-format</artifactId>
    <version>1.0</version>
 
    <build>
@@ -13,9 +13,8 @@
              <configuration>
                  <includes>
                      <include>file1.css</include>
-                     <include>dict1/**/*.css</include>
                  </includes>
-                 <format>lint-xml</format>
+                 <format>csslint-xml</format>
              </configuration>
             <executions>
                <execution>

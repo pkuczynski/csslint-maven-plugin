@@ -1,7 +1,7 @@
 <project>
    <modelVersion>4.0.0</modelVersion>
    <groupId>csslint-maven-plugin.it</groupId>
-   <artifactId>test-custom-rules</artifactId>
+   <artifactId>test-checkstyle-xml-format</artifactId>
    <version>1.0</version>
 
    <build>
@@ -11,15 +11,10 @@
             <artifactId>csslint-maven-plugin</artifactId>
             <version>@project.version@</version>
              <configuration>
-                 <rules>
-                     <rule>ids</rule>
-                     <rule>important</rule>
-                     <rule>import</rule>
-                 </rules>
                  <includes>
                      <include>file1.css</include>
                  </includes>
-                 <format>lint-xml</format>
+                 <format>checkstyle-xml</format>
              </configuration>
             <executions>
                <execution>

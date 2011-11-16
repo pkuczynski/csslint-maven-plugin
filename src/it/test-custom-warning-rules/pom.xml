@@ -1,7 +1,7 @@
 <project>
    <modelVersion>4.0.0</modelVersion>
    <groupId>csslint-maven-plugin.it</groupId>
-   <artifactId>test-explcit-text-format</artifactId>
+   <artifactId>test-custom-warning-rules</artifactId>
    <version>1.0</version>
 
    <build>
@@ -11,10 +11,17 @@
             <artifactId>csslint-maven-plugin</artifactId>
             <version>@project.version@</version>
              <configuration>
+                 <warnings>
+                    <warning>ids</warning>
+                    <warning>important</warning>
+                    <warning>import</warning>
+                 </warnings>
+
                  <includes>
                      <include>file1.css</include>
                  </includes>
-                 <format>text</format>
+
+                 <format>lint-xml</format>
              </configuration>
             <executions>
                <execution>
