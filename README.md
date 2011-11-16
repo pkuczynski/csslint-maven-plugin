@@ -148,14 +148,14 @@ The directory to scan. The directory used by 'includes' and 'excludes' options.
 
 ##### includes
 
-List of includes patterns (Ant patterns). For more information about pattern's syntax check documentation: http://ant.apache.org/manual/dirtasks.html#patterns
+List of includes patterns (Ant patterns). For more information about pattern's syntax check [documentation](http://ant.apache.org/manual/dirtasks.html#patterns).
 
 * Type: _List_
 * Required: _Yes_
 
 ##### excludes
 
-List of excludes patterns (Ant patterns). For more information about pattern's syntax check documentation: http://ant.apache.org/manual/dirtasks.html#patterns
+List of excludes patterns (Ant patterns). For more information about pattern's syntax check [documentation](http://ant.apache.org/manual/dirtasks.html#patterns).
 
 * Type: _List_
 * Required: _No_
