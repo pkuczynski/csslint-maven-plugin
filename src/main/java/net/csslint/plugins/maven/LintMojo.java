@@ -52,8 +52,6 @@ public class LintMojo extends AbstractMojo {
     private static final String SCRIPT_FILE = "csslint-rhino.js";
     private static final String OUTPUT_FILE = "csslint.xml";
 
-    private int scriptExitCode;
-
     /**
      * TODO Update rule list
      *
@@ -202,28 +200,25 @@ public class LintMojo extends AbstractMojo {
         addIncludesArgument(arguments);
 
         // Invoke script with specified arguments by means Rhino
+
         int exitCode = 0;
 
         try {
-            exitCode =
-                    Main.exec(arguments.toArray(new String[arguments.size()]));
+            exitCode = Main.exec(arguments.toArray(new String[arguments.size()]));
         } catch (ExitScript e) {
-            if (scriptExitCode != 0) {
-                throw new IllegalStateException("There are errors in " +
-                        "your CSS files");
+            if (e.getScriptExitCode() != 0) {
+                throw new MojoExecutionException("There are errors in your CSS files");
             }
         }
 
         if (exitCode != 0) {
-            throw new IllegalStateException("Error occurs when " +
-                    "executing CSS Lint tool");
+            throw new MojoExecutionException("Error occurs when executing CSS Lint tool");
         }
     }
 
     private void validateInput() throws MojoExecutionException {
         if (includes == null || includes.isEmpty()) {
-            throw new MojoExecutionException("You have to define " +
-                    "file to process");
+            throw new MojoExecutionException("You have to define file to process");
         }
     }
 
@@ -326,8 +321,8 @@ public class LintMojo extends AbstractMojo {
          */
         if (!script.exists()) {
 
-            getLog().debug(String.format("Extract script to build " +
-                    "directory, script='%s'", script.getAbsolutePath()));
+            getLog().debug(String.format("Extract script to build directory, " +
+                    "script='%s'", script.getAbsolutePath()));
 
             try {
                 extractFileFromClasspath(script);
@@ -335,9 +330,8 @@ public class LintMojo extends AbstractMojo {
                 throw new RuntimeException(e);
             }
         } else {
-            getLog().debug(String.format("Script already exists in build " +
-                    "directory, thus skip extracting, script='%s'",
-                    script.getAbsolutePath()));
+            getLog().debug(String.format("Script already exists in build directory, thus skip extracting, " +
+                    "script='%s'", script.getAbsolutePath()));
         }
 
         arguments.add(script.getAbsolutePath());
@@ -363,13 +357,14 @@ public class LintMojo extends AbstractMojo {
         Main.getGlobal().initQuitAction(new QuitAction() {
 
             @Override
-            public void quit(Context cx, int exitCode) {
+            public void quit(Context cx, int scriptExitCode) {
 
-                // Pass exit code from "csslint-rhino.js" script
-                scriptExitCode = exitCode;
-
-                // Prevent script from running (comes from Rhino examples)
-                throw new ExitScript();
+                /*
+                    Pass exit code from "csslint-rhino.js" script.
+                    Prevent script from running (comes from Rhino examples).
+                    We have to throw Error because any Exception is caught by Rhino.
+                */
+                throw new ExitScript(scriptExitCode);
             }
         });
     }
@@ -409,11 +404,18 @@ public class LintMojo extends AbstractMojo {
         }
     }
 
-
     /**
      * The main purpose is to mark that script wants exit with specified code.
      */
     static class ExitScript extends Error {
+        private int scriptExitCode;
 
+        ExitScript(int scriptExitCode) {
+            this.scriptExitCode = scriptExitCode;
+        }
+
+        public int getScriptExitCode() {
+            return scriptExitCode;
+        }
     }
 }
