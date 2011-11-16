@@ -9,7 +9,7 @@
          <plugin>
             <groupId>net.csslint</groupId>
             <artifactId>csslint-maven-plugin</artifactId>
-            <version>0.7.0</version>
+            <version>0.8.1</version>
              <configuration>
                  <includes>
                      <include>file1.css</include>
