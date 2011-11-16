@@ -17,12 +17,17 @@ _Note:_ Plugin isn't available in Maven central repository yet.
              <plugin>
                 <groupId>net.csslint</groupId>
                 <artifactId>csslint-maven-plugin</artifactId>
-                <version>0.7.0</version>
+                <version>0.8.1</version>
                 <configuration>
-                   <rules>
-                      <rule/>
+                   <errors>
+                      <error/>
                       ...
-                   </rules>
+                   </errors>
+
+                   <warnings>
+                     <warning/>
+                     ...
+                   </warnings>
 
                    <baseDirectory/>
 
@@ -55,9 +60,46 @@ _Note:_ Plugin isn't available in Maven central repository yet.
 
 ## Parameters
 
-##### rules
+##### errors
 
-List of rules that the tool uses (if not specified all available rules are applied). Available rules:
+List of rules that the tool uses. If the rule is matched, an error message is produced. Errors cause build failure. Errors tag has higher priority then warnings tag.
+
+Available rules:
+
+<table>
+<tr><td><strong>ID</strong></td><td><strong>Description</strong></td></tr>
+<tr><td>adjoining-classes</td><td>Don't use adjoining classes</td></tr>
+<tr><td>box-model</td><td>Beware of broken box model</td></tr>
+<tr><td>compatible-vendor-prefixes</td><td>Use compatible vendor prefixes</td></tr>
+<tr><td>display-property-grouping</td><td>Use properties appropriate for <code>display</code></td></tr>
+<tr><td>duplicate-properties</td><td>Avoid duplicate properties</td></tr>
+<tr><td>empty-rules</td><td>Disallow empty rules</td></tr>
+<tr><td>floats</td><td>Don't use too many floats</td></tr>
+<tr><td>font-faces</td><td>Don't use too many web fonts</td></tr>
+<tr><td>font-sizes</td><td>Don't use too many font sizes</td></tr>
+<tr><td>gradients</td><td>Include all gradient definitions</td></tr>
+<tr><td>ids</td><td>Don't use IDs</td></tr>
+<tr><td>import</td><td>Avoid <code>@import</code></td></tr>
+<tr><td>important</td><td>Disallow <code>!important</code></td></tr>
+<tr><td>overqualified-elements</td><td>Don't use overqualified elements</td></tr>
+<tr><td>qualified-headings</td><td>Don't qualify headings</td></tr>
+<tr><td>regex-selectors</td><td>Don't use selectors that look like regexs</td></tr>
+<tr><td>text-indent</td><td>Don't use negative <code>text-indent</code></td></tr>
+<tr><td>unique-headings</td><td>Heading should only be defined once</td></tr>
+<tr><td>vendor-prefix</td><td>Use vendor prefix properties correctly</td></tr>
+<tr><td>zero-units</td><td>Don't use units for 0 values</td></tr>
+<tr><td>known-properties</td><td>Require use of known properties</td></tr>
+<tr><td>universal-selector</td><td>Disallow universal selector</td></tr>
+</table>
+
+* Type: _List_
+* Required: _No_
+
+##### warnings
+
+List of rules that the tool uses (if not specified all available rules are applied). If the rule is matched, a warning message is produced. Warnings don't cause build failure.
+
+Available rules:
 
 <table>
 <tr><td><strong>ID</strong></td><td><strong>Description</strong></td></tr>
@@ -139,7 +181,7 @@ The output format. Choose between `text` and `lint-xml`. `text` is console logge
              <plugin>
                 <groupId>net.csslint</groupId>
                 <artifactId>csslint-maven-plugin</artifactId>
-                <version>0.7.0</version>
+                <version>0.8.1</version>
                 <configuration>
                    <includes>
                       <include>**/*.css</include>

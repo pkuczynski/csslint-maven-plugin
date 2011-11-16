@@ -26,9 +26,7 @@ li.last.first {
     li.inline {
       color: black;
     }
-
-
-@charset "UTF-8"; 
+}
 
 @page {
   margin: 10%;

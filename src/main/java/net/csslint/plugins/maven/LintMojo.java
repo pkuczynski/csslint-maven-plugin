@@ -55,8 +55,11 @@ public class LintMojo extends AbstractMojo {
     private int scriptExitCode;
 
     /**
-     * List of rules that the tool uses
-     * (if not specified all available rules are applied).
+     * TODO Update rule list
+     *
+     * List of rules that the tool uses.
+     * <p/>
+     * If the rule is matched, an error message is produced. Errors cause build failure.
      * <p/>
      * Available rules:
      * <ul>
@@ -85,7 +88,43 @@ public class LintMojo extends AbstractMojo {
      * @parameter
      * @optional
      */
-    private List<String> rules;
+    private List<String> errors;
+
+    /**
+     * TODO Update rule list
+     *
+     * List of rules that the tool uses (if not specified all available rules are applied).
+     * <p/>
+     * If the rule is matched, a warning message is produced. Warnings don't cause build failure.
+     * <p/>
+     * Available rules:
+     * <ul>
+     * <li>adjoining-classes : Don't use adjoining classes</li>
+     * <li>box-model : Beware of broken box model</li>
+     * <li>compatible-vendor-prefixes : Use compatible vendor prefixes</li>
+     * <li>display-property-grouping : Use properties appropriate for 'display'</li>
+     * <li>duplicate-properties : Avoid duplicate properties</li>
+     * <li>empty-rules : Disallow empty rules</li>
+     * <li>floats : Don't use too many floats</li>
+     * <li>font-faces : Don't use too many web fonts</li>
+     * <li>font-sizes : Don't use too many font sizes</li>
+     * <li>gradients : Include all gradient definitions</li>
+     * <li>ids : Don't use IDs</li>
+     * <li>import : Avoid '@import'</li>
+     * <li>important : Disallow '!important'</li>
+     * <li>overqualified-elements : Don't use overqualified elements</li>
+     * <li>qualified-headings : Don't qualify headings</li>
+     * <li>regex-selectors : Don't use selectors that look like regexs</li>
+     * <li>text-indent : Don't use negative text-indent'</li>
+     * <li>unique-headings : Heading should only be defined once</li>
+     * <li>vendor-prefix : Use vendor prefix properties correctly</li>
+     * <li>zero-units : Don't use units for 0 values</li>
+     * </ul>
+     *
+     * @parameter
+     * @optional
+     */
+    private List<String> warnings;
 
     /**
      * The directory to scan.
@@ -152,7 +191,7 @@ public class LintMojo extends AbstractMojo {
 
         // Build arguments list
         addScriptArgument(arguments);
-        addRulesArgument(arguments);
+        addErrorsAndWarningsArguments(arguments);
         addOutputArgument(arguments);
         addIncludesArgument(arguments);
 
@@ -207,31 +246,39 @@ public class LintMojo extends AbstractMojo {
         }
     }
 
-    private void addRulesArgument(List<String> arguments) {
+    private void addErrorsAndWarningsArguments(List<String> arguments) {
         assert  arguments != null;
 
-        if (rules != null && !rules.isEmpty()) {
-
-            getLog().debug(String.format("Apply custom rules set, which was " +
-                    "specified by user, rules='%s'", rules));
-
-            StringBuilder sb = new StringBuilder();
-
-            sb.append("--rules=");
-
-            for (String rule : rules) {
-                sb.append(rule);
-                sb.append(',');
-            }
-
-            // Remove last ',' character
-            sb.deleteCharAt(sb.length() - 1);
-
-            arguments.add(sb.toString());
-        } else {
-            getLog().debug("Apply all available rules, because user " +
-                    "didn't specify any custom set");
+        if (errors != null && !errors.isEmpty()) {
+            getLog().debug(String.format("Apply errors rules set, which was specified by user, errors='%s'", errors));
+            addRulesToCustomArgument("--errors=", errors, arguments);
         }
+
+        if (warnings != null && !warnings.isEmpty()) {
+            getLog().debug(String.format("Apply warnings rules set, which was specified by user, warnings='%s'", warnings));
+            addRulesToCustomArgument("--warnings=", warnings, arguments);
+        }
+
+        if ((errors == null || errors.isEmpty())
+                && (warnings == null || warnings.isEmpty())) {
+            getLog().debug("Apply all available rules, because user didn't specify any custom set");
+        }
+    }
+
+    private void addRulesToCustomArgument(String argumentName , List<String> rules, List<String> arguments) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(argumentName);
+
+        for (String rule : rules) {
+            sb.append(rule);
+            sb.append(',');
+        }
+
+        // Remove last ',' character
+        sb.deleteCharAt(sb.length() - 1);
+
+        arguments.add(sb.toString());
     }
 
     private void addScriptArgument(List<String> arguments) {
