@@ -17,7 +17,7 @@ _Note:_ Plugin isn't available in Maven central repository yet.
              <plugin>
                 <groupId>net.csslint</groupId>
                 <artifactId>csslint-maven-plugin</artifactId>
-                <version>0.8.1</version>
+                <version>0.8.1-patch01</version>
                 <configuration>
                    <errors>
                       <error/>
@@ -204,7 +204,7 @@ External file formats (the location of the file is `${project.build.directory}/c
              <plugin>
                 <groupId>net.csslint</groupId>
                 <artifactId>csslint-maven-plugin</artifactId>
-                <version>0.8.1</version>
+                <version>0.8.1-patch01</version>
                 <configuration>
                    <includes>
                       <include>**/*.css</include>
