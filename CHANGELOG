@@ -1,0 +1,7 @@
+November 16, 2011 - v0.8.1
+
+* Upgraded to CSS Lint 0.8.1
+* Add missing rules introduced in CSS Lint 0.8
+* Added <excludes/> option
+* Added <errors/> and <warnings/> options (replacing <rules/> option)
+* Extended <format/> option
