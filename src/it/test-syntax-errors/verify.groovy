@@ -6,4 +6,9 @@ assert pluginOutput.depthFirst().grep{ it.@severity == 'warning' }.size() == 0
 assert pluginOutput.depthFirst().grep{ it.@severity == 'error' }.size() == 2
 
 def allOutput = new File( basedir, "build.log" ).getText();
-assert allOutput.contains("BUILD FAILURE");
+
+/*
+    In Maven v2.x, there is "BUILD ERROR" phrase.
+    In Maven v3.x, there is "BUILD FAILURE" phrase.
+ */
+assert allOutput.contains("BUILD FAILURE") ||  allOutput.contains("BUILD ERROR");
